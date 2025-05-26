@@ -11,11 +11,11 @@ class TelaRecuperarSenha extends StatefulWidget {
 }
 
 class _EstadoTelaRecuperarSenha extends State<TelaRecuperarSenha> {
-  final _chaveFormulario = GlobalKey<FormBuilderState>();
+  final _formKey = GlobalKey<FormBuilderState>();
   bool _carregando = false;
 
   void _enviarFormulario() {
-    if (_chaveFormulario.currentState?.saveAndValidate() ?? false) {
+    if (_formKey.currentState?.saveAndValidate() ?? false) {
       setState(() => _carregando = true);
 
       Future.delayed(const Duration(seconds: 2), () {
@@ -23,7 +23,7 @@ class _EstadoTelaRecuperarSenha extends State<TelaRecuperarSenha> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('E-mail de recuperação enviado!')),
         );
-        context.pop(); // Volta para a tela anterior (login)
+        context.pop(); // Volta para o login
       });
     }
   }
@@ -31,50 +31,96 @@ class _EstadoTelaRecuperarSenha extends State<TelaRecuperarSenha> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Recuperar Senha')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: FormBuilder(
-          key: _chaveFormulario,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Digite seu e-mail para receber as instruções de recuperação de senha',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 24),
-              FormBuilderTextField(
-                name: 'email',
-                decoration: const InputDecoration(
-                  labelText: 'E-mail',
-                  prefixIcon: Icon(Icons.email),
-                ),
-                validator: FormBuilderValidators.compose([
-                  FormBuilderValidators.required(
-                    errorText: 'Campo obrigatório',
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: const Text('Recuperar Senha'),
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          child: FormBuilder(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.lock_reset, color: Colors.white70, size: 80),
+                const SizedBox(height: 16),
+                const Text(
+                  'Esqueceu a senha?',
+                  style: TextStyle(
+                    fontSize: 24,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
-                  FormBuilderValidators.email(errorText: 'E-mail inválido'),
-                ]),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _carregando ? null : _enviarFormulario,
-                  child:
-                      _carregando
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('Enviar'),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () => context.pop(),
-                child: const Text('Voltar para o login'),
-              ),
-            ],
+                const SizedBox(height: 8),
+                const Text(
+                  'Digite seu e-mail e enviaremos instruções para redefinir sua senha.',
+                  style: TextStyle(color: Colors.white60, fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 32),
+                FormBuilderTextField(
+                  name: 'email',
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'E-mail',
+                    labelStyle: const TextStyle(color: Colors.white70),
+                    filled: true,
+                    fillColor: Colors.white10,
+                    prefixIcon: const Icon(Icons.email, color: Colors.white),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: const BorderSide(color: Colors.white30),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: const BorderSide(color: Colors.white),
+                    ),
+                  ),
+                  validator: FormBuilderValidators.compose([
+                    FormBuilderValidators.required(
+                      errorText: 'Campo obrigatório',
+                    ),
+                    FormBuilderValidators.email(errorText: 'E-mail inválido'),
+                  ]),
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      minimumSize: const Size.fromHeight(50),
+                    ),
+                    onPressed: _carregando ? null : _enviarFormulario,
+                    child:
+                        _carregando
+                            ? const CircularProgressIndicator(
+                              color: Colors.black,
+                            )
+                            : const Text(
+                              'Enviar',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () => context.pop(),
+                  style: TextButton.styleFrom(foregroundColor: Colors.white70),
+                  child: const Text('Voltar para o login'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

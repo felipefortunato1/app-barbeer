@@ -11,12 +11,12 @@ class TelaCadastro extends StatefulWidget {
 }
 
 class _EstadoTelaCadastro extends State<TelaCadastro> {
-  final _chaveFormulario = GlobalKey<FormBuilderState>();
+  final _formKey = GlobalKey<FormBuilderState>();
   bool _carregando = false;
 
   void _cadastrar() {
-    if (_chaveFormulario.currentState?.saveAndValidate() ?? false) {
-      final dados = _chaveFormulario.currentState!.value;
+    if (_formKey.currentState?.saveAndValidate() ?? false) {
+      final dados = _formKey.currentState!.value;
 
       if (dados['senha'] != dados['confirmarSenha']) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -40,80 +40,129 @@ class _EstadoTelaCadastro extends State<TelaCadastro> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Cadastro')),
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: const Text('Criar Conta'),
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
         child: FormBuilder(
-          key: _chaveFormulario,
+          key: _formKey,
           child: Column(
             children: [
-              FormBuilderTextField(
-                name: 'nome',
-                decoration: const InputDecoration(
-                  labelText: 'Nome',
-                  prefixIcon: Icon(Icons.person),
+              const Text(
+                'Bem-vindo à BarBeer',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 26,
+                  fontWeight: FontWeight.w700,
                 ),
-                validator: FormBuilderValidators.required(),
               ),
+              const SizedBox(height: 8),
+              const Text(
+                'Preencha os dados abaixo para criar sua conta',
+                style: TextStyle(color: Colors.white60, fontSize: 14),
+              ),
+              const SizedBox(height: 32),
+
+              _input('nome', 'Nome completo', Icons.person),
               const SizedBox(height: 16),
-              FormBuilderTextField(
-                name: 'email',
-                decoration: const InputDecoration(
-                  labelText: 'E-mail',
-                  prefixIcon: Icon(Icons.email),
-                ),
+
+              _input(
+                'email',
+                'E-mail',
+                Icons.email,
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
                   FormBuilderValidators.email(),
                 ]),
               ),
               const SizedBox(height: 16),
-              FormBuilderTextField(
-                name: 'telefone',
-                decoration: const InputDecoration(
-                  labelText: 'Telefone',
-                  prefixIcon: Icon(Icons.phone),
-                ),
-                validator: FormBuilderValidators.required(),
+
+              _input('telefone', 'Telefone', Icons.phone),
+              const SizedBox(height: 16),
+
+              _input(
+                'senha',
+                'Senha',
+                Icons.lock,
+                obscure: true,
+                isSenha: true,
               ),
               const SizedBox(height: 16),
-              FormBuilderTextField(
-                name: 'senha',
-                decoration: const InputDecoration(
-                  labelText: 'Senha',
-                  prefixIcon: Icon(Icons.lock),
-                ),
-                obscureText: true,
-                validator: FormBuilderValidators.required(),
+
+              _input(
+                'confirmarSenha',
+                'Confirmar Senha',
+                Icons.lock,
+                obscure: true,
               ),
-              const SizedBox(height: 16),
-              FormBuilderTextField(
-                name: 'confirmarSenha',
-                decoration: const InputDecoration(
-                  labelText: 'Confirmar Senha',
-                  prefixIcon: Icon(Icons.lock),
-                ),
-                obscureText: true,
-                validator: FormBuilderValidators.required(),
-              ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
+
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    minimumSize: const Size.fromHeight(50),
+                  ),
                   onPressed: _carregando ? null : _cadastrar,
                   child:
                       _carregando
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('Cadastrar'),
+                          ? const CircularProgressIndicator(color: Colors.black)
+                          : const Text(
+                            'Cadastrar',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                 ),
               ),
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () => context.pop(),
+                style: TextButton.styleFrom(foregroundColor: Colors.white70),
                 child: const Text('Já tem uma conta? Faça login'),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _input(
+    String nome,
+    String label,
+    IconData icone, {
+    bool obscure = false,
+    bool isSenha = false,
+    String? Function(String?)? validator,
+  }) {
+    return FormBuilderTextField(
+      name: nome,
+      obscureText: obscure,
+      style: const TextStyle(color: Colors.white),
+      validator: validator ?? FormBuilderValidators.required(),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white70),
+        filled: true,
+        fillColor: Colors.white10,
+        prefixIcon: Icon(icone, color: Colors.white),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(color: Colors.white30),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(color: Colors.white),
         ),
       ),
     );
