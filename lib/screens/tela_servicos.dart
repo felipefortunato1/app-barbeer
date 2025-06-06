@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../models/servico.dart';
-import 'package:barbeer/widgets/menu_drawer.dart';
+import '../widgets/menu_drawer.dart';
+import '../widgets/custom_card.dart';
+import '../widgets/custom_button.dart';
+import '../utils/app_theme.dart';
 
 class TelaServicos extends StatelessWidget {
   const TelaServicos({super.key});
@@ -46,20 +49,189 @@ class TelaServicos extends StatelessWidget {
       drawer: buildMenuDrawer(context),
       appBar: AppBar(
         title: const Text('Serviços'),
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
         elevation: 0,
+        backgroundColor: AppTheme.primaryColor,
       ),
-      backgroundColor: Colors.black,
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppTheme.secondaryColor,
+                  AppTheme.secondaryColor.withOpacity(0.8),
+                ],
+              ),
+            ),
+            padding: const EdgeInsets.all(AppTheme.paddingLarge),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Nossos Serviços',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: AppTheme.paddingSmall),
+                const Text(
+                  'Escolha o serviço desejado e agende seu horário',
+                  style: TextStyle(fontSize: 16, color: Colors.white70),
+                ),
+                const SizedBox(height: AppTheme.paddingLarge),
+                Hero(
+                  tag: 'servico_header',
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                    child: Image.asset(
+                      'img/servico_limpeza2.png',
+                      height: 180,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              color: AppTheme.backgroundDark,
+              padding: const EdgeInsets.all(AppTheme.paddingMedium),
+              child: ListView.separated(
+                itemCount: _servicos.length,
+                separatorBuilder:
+                    (_, __) => const SizedBox(height: AppTheme.paddingMedium),
+                itemBuilder: (context, index) {
+                  final servico = _servicos[index];
+                  final imagem = _getImagemServico(servico.nome);
+                  return Hero(
+                    tag: 'servico_${servico.nome}',
+                    child: CustomCard(
+                      child: InkWell(
+                        onTap: () => context.push('/agendar', extra: servico),
+                        borderRadius: BorderRadius.circular(
+                          AppTheme.borderRadius,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppTheme.paddingMedium),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.borderRadius,
+                                ),
+                                child: Image.asset(
+                                  imagem,
+                                  height: 120,
+                                  width: 120,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppTheme.paddingMedium,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        servico.nome,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: AppTheme.paddingSmall,
+                                      ),
+                                      Text(
+                                        servico.descricao,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: AppTheme.paddingSmall,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'R\$ ${servico.preco.toStringAsFixed(2)}',
+                                                style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              Text(
+                                                '${servico.duracao.inMinutes} min',
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.white60,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            width: 100,
+                                            child: CustomButton(
+                                              text: 'Agendar',
+                                              onPressed:
+                                                  () => context.push(
+                                                    '/agendar',
+                                                    extra: servico,
+                                                  ),
+                                              icon: Icons.calendar_today,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
-        backgroundColor: Colors.black,
+        backgroundColor: AppTheme.primaryColor,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white60,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.cut), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.cut), label: 'Serviços'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'Agendamentos',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Barbeiros'),
         ],
         onTap: (index) {
           switch (index) {
@@ -70,144 +242,10 @@ class TelaServicos extends StatelessWidget {
               context.go('/meus-agendamentos');
               break;
             case 2:
-              context.go('/perfil');
+              context.go('/barbeiros');
               break;
           }
         },
-      ),
-      body: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            color: const Color.fromARGB(255, 94, 98, 100),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Serviços',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.asset(
-                    'img/servico_limpeza2.png',
-                    height: 150,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              color: Colors.black,
-              padding: const EdgeInsets.all(16),
-              child: ListView.separated(
-                itemCount: _servicos.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 16),
-                itemBuilder: (context, index) {
-                  final servico = _servicos[index];
-                  final imagem = _getImagemServico(servico.nome);
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[900],
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(16),
-                            bottomLeft: Radius.circular(16),
-                          ),
-                          child: Image.asset(
-                            imagem,
-                            height: 100,
-                            width: 100,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  servico.nome,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  servico.descricao,
-                                  style: const TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'R\$ ${servico.preco.toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color.fromARGB(
-                                          255,
-                                          164,
-                                          174,
-                                          180,
-                                        ),
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                        ),
-                                      ),
-                                      onPressed:
-                                          () => context.push(
-                                            '/agendar',
-                                            extra: servico,
-                                          ),
-                                      child: const Text('Agendar'),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

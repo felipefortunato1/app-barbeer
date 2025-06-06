@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../models/servico.dart';
-import 'package:barbeer/widgets/menu_drawer.dart';
+import '../widgets/menu_drawer.dart';
+import '../widgets/custom_card.dart';
+import '../widgets/custom_button.dart';
+import '../utils/app_theme.dart';
 
 class Agendamento {
   final Servico servico;
@@ -54,161 +57,137 @@ class _EstadoTelaAgendamentos extends State<TelaAgendamentos> {
     ),
   ];
 
+  void _cancelarAgendamento(BuildContext context, Agendamento agendamento) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: AppTheme.surfaceDark,
+            title: const Text(
+              'Cancelar Agendamento',
+              style: AppTheme.titleStyle,
+            ),
+            content: const Text(
+              'Tem certeza que deseja cancelar este agendamento?',
+              style: AppTheme.bodyStyle,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Não'),
+              ),
+              TextButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Agendamento cancelado com sucesso!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  Navigator.pop(context);
+                },
+                child: const Text('Sim'),
+              ),
+            ],
+          ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final dateFormat = DateFormat('dd/MM/yyyy', 'pt_BR');
+
     return Scaffold(
-      backgroundColor: Colors.black,
       drawer: buildMenuDrawer(context),
-      appBar: AppBar(
-        title: const Text('Meus Agendamentos'),
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Meus Agendamentos')),
       body:
           _agendamentos.isEmpty
-              ? const Center(
+              ? Center(
                 child: Text(
                   'Nenhum agendamento encontrado',
-                  style: TextStyle(color: Colors.white70),
+                  style: AppTheme.bodyStyle,
                 ),
               )
               : ListView.builder(
                 itemCount: _agendamentos.length,
                 itemBuilder: (context, index) {
                   final agendamento = _agendamentos[index];
-                  return Card(
-                    color: Colors.grey[900],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 4,
+                  return CustomCard(
                     margin: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
+                      horizontal: AppTheme.paddingMedium,
+                      vertical: AppTheme.paddingSmall,
                     ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(16),
-                      title: Text(
-                        agendamento.servico.nome,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.white,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          agendamento.servico.nome,
+                          style: AppTheme.titleStyle,
                         ),
-                      ),
-                      subtitle: Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        const SizedBox(height: AppTheme.paddingSmall),
+                        Text(
+                          'Barbeiro: ${agendamento.barbeiro}',
+                          style: AppTheme.bodyStyle,
+                        ),
+                        Text(
+                          'Data: ${dateFormat.format(agendamento.data)}',
+                          style: AppTheme.bodyStyle,
+                        ),
+                        Text(
+                          'Horário: ${agendamento.horario.format(context)}',
+                          style: AppTheme.bodyStyle,
+                        ),
+                        Text(
+                          'Preço: R\$ ${agendamento.servico.preco.toStringAsFixed(2)}',
+                          style: AppTheme.bodyStyle,
+                        ),
+                        const SizedBox(height: AppTheme.paddingSmall),
+                        Row(
                           children: [
-                            Text(
-                              'Barbeiro: ${agendamento.barbeiro}',
-                              style: const TextStyle(color: Colors.white70),
-                            ),
-                            Text(
-                              'Data: ${DateFormat('dd/MM/yyyy').format(agendamento.data)}',
-                              style: const TextStyle(color: Colors.white70),
-                            ),
-                            Text(
-                              'Horário: ${agendamento.horario.format(context)}',
-                              style: const TextStyle(color: Colors.white70),
-                            ),
-                            Text(
-                              'Preço: R\$ ${agendamento.servico.preco.toStringAsFixed(2)}',
-                              style: const TextStyle(color: Colors.white70),
-                            ),
-                            Row(
-                              children: [
-                                Icon(
+                            Icon(
+                              agendamento.finalizado
+                                  ? Icons.check_circle
+                                  : Icons.access_time,
+                              color:
                                   agendamento.finalizado
-                                      ? Icons.check_circle
-                                      : Icons.access_time,
-                                  color:
-                                      agendamento.finalizado
-                                          ? Colors.green
-                                          : Colors.orange,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  agendamento.finalizado
-                                      ? 'Concluído'
-                                      : 'Pendente',
-                                  style: TextStyle(
-                                    color:
-                                        agendamento.finalizado
-                                            ? Colors.green
-                                            : Colors.orange,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
+                                      ? Colors.green
+                                      : Colors.orange,
+                              size: 18,
                             ),
-                          ],
-                        ),
-                      ),
-                      trailing:
-                          agendamento.finalizado
-                              ? null
-                              : IconButton(
+                            const SizedBox(width: AppTheme.paddingSmall),
+                            Text(
+                              agendamento.finalizado ? 'Concluído' : 'Pendente',
+                              style: TextStyle(
+                                color:
+                                    agendamento.finalizado
+                                        ? Colors.green
+                                        : Colors.orange,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            if (!agendamento.finalizado) ...[
+                              const Spacer(),
+                              IconButton(
                                 icon: const Icon(
                                   Icons.cancel,
                                   color: Colors.red,
                                 ),
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder:
-                                        (context) => AlertDialog(
-                                          backgroundColor: Colors.grey[900],
-                                          title: const Text(
-                                            'Cancelar Agendamento',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          content: const Text(
-                                            'Tem certeza que deseja cancelar este agendamento?',
-                                            style: TextStyle(
-                                              color: Colors.white70,
-                                            ),
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed:
-                                                  () => Navigator.pop(context),
-                                              child: const Text('Não'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text(
-                                                      'Agendamento cancelado com sucesso!',
-                                                    ),
-                                                  ),
-                                                );
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('Sim'),
-                                            ),
-                                          ],
-                                        ),
-                                  );
-                                },
+                                onPressed:
+                                    () => _cancelarAgendamento(
+                                      context,
+                                      agendamento,
+                                    ),
                               ),
+                            ],
+                          ],
+                        ),
+                      ],
                     ),
                   );
                 },
               ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1,
-        backgroundColor: Colors.black,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white60,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.cut), label: 'Serviços'),
           BottomNavigationBarItem(

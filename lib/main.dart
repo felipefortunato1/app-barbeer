@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'screens/auth/tela_login.dart';
 import 'screens/auth/tela_cadastro.dart';
@@ -10,6 +11,7 @@ import 'screens/tela_agendamento.dart';
 import 'screens/tela_agendamentos.dart';
 import 'screens/tela_perfil.dart';
 import 'screens/tela_barbeiros.dart';
+import 'utils/app_theme.dart';
 
 import 'models/servico.dart';
 
@@ -60,27 +62,17 @@ class AppBarbeer extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'BarBeer',
-      theme: ThemeData(
-        primarySwatch: Colors.brown,
-        scaffoldBackgroundColor: Colors.grey[100],
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.brown,
-          foregroundColor: Colors.white,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.brown,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          filled: true,
-          fillColor: Colors.white,
-        ),
-      ),
+      theme: AppTheme.darkTheme,
       routerConfig: _rotas,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('pt', 'BR'),
+      ],
+      locale: const Locale('pt', 'BR'),
     );
   }
 }
